@@ -1,0 +1,172 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#define START ios_base::sync_with_stdio(false); fin.tie(nullptr); fout.tie(nullptr);
+#define FINISH fin.close(); fout.close(); return 0;
+
+typedef unsigned long long ull;
+
+ifstream fin("joc.in");
+ofstream fout("joc.out");
+
+int main()
+{
+    START;
+
+    int cerinta, n;
+    fin >> cerinta >> n;
+
+    if(cerinta == 1){
+        if(n == 0 or n == 1){
+            fout << 1;
+            FINISH;
+        }
+
+        int numarDivizori = 2;
+
+        for(int d = 2; d * d <= n; ++ d){
+            if(n % d == 0){
+                ++ numarDivizori;
+
+                if(d * d != n){
+                    ++ numarDivizori;
+                }
+            }
+        }
+
+        fout << numarDivizori;
+        FINISH;
+    }
+    else if(cerinta == 2){
+        //impar X=((numărul_mutării + ((numărul_căsuței_pionului + N) mod 10)) mod 6) + 1
+        //par X=((((numărul_mutării+1) mod 5) + ((numărul_căsuței_pionului + N) mod 10)) mod 6) + 1
+
+        int fv[7]{}; //vector de frecventa
+        int jucator1 = 1; //pozitia jucator 1
+        int jucator2 = 1; //pozitia jucator 2
+        int mutare = 1; //mutarea curenta
+        int numar; //patratele pe care trebuie sa le parcurga jucatorul
+        int numarMutare = 0; //numarul mutarii
+        int fvMax = 0; //cele mai multe aparitii
+
+        while(jucator1 < n && jucator2 < n){
+            ++ numarMutare;
+            if(mutare == 1){
+                if(numarMutare % 2 == 1){
+                    numar = ((numarMutare + ((jucator1 + n) % 10)) % 6) + 1;
+                }
+                else{
+                    numar = ((((numarMutare + 1) % 5) + ((jucator1 + n) % 10)) % 6) + 1;
+                }
+
+                jucator1 += numar;
+                ++ fv[numar];
+                fvMax = max(fvMax, fv[numar]);
+
+                if(numar != 6){
+                    mutare = 2;
+                }
+
+                if(jucator1 == jucator2){
+                    jucator2 = 1;
+                }
+            }
+            else if(mutare == 2){
+                if(numarMutare % 2 == 1){
+                    numar = ((numarMutare + ((jucator2 + n) % 10)) % 6) + 1;
+                }
+                else{
+                    numar = ((((numarMutare + 1) % 5) + ((jucator2 + n) % 10)) % 6) + 1;
+                }
+
+                jucator2 += numar;
+                ++ fv[numar];
+                fvMax = max(fvMax, fv[numar]);
+
+                if(numar != 6){
+                    mutare = 1;
+                }
+
+                if(jucator1 == jucator2){
+                    jucator1 = 1;
+                }
+            }
+        }
+
+        fout << fvMax;
+        FINISH;
+    }
+    else{
+
+        int casuteJucator1[100001], cj1 = 1; //casutele pe care le-a parcurs jucatorul 1
+        int casuteJucator2[100001], cj2 = 1; //casutele pe care le-a parcurs jucatorul 2
+        int jucator1 = 1; //pozitia jucator 1
+        int jucator2 = 1; //pozitia jucator 2
+        int mutare = 1; //mutarea curenta
+        int numar; //patratele pe care trebuie sa le parcurga jucatorul
+        int numarMutare = 0; //numarul mutarii
+        int fvMax = 0; //cele mai multe aparitii
+
+        casuteJucator1[1] = 1;
+        casuteJucator2[1] = 1;
+        while(jucator1 < n && jucator2 < n){
+            ++ numarMutare;
+            if(mutare == 1){
+                if(numarMutare % 2 == 1){
+                    numar = ((numarMutare + ((jucator1 + n) % 10)) % 6) + 1;
+                }
+                else{
+                    numar = ((((numarMutare + 1) % 5) + ((jucator1 + n) % 10)) % 6) + 1;
+                }
+
+                jucator1 += numar;
+                cj1 ++;
+                casuteJucator1[cj1] = jucator1;
+
+                if(numar != 6){
+                    mutare = 2;
+                }
+
+                if(jucator1 == jucator2){
+                    cj2 ++;
+                    jucator2 = 1;
+                    casuteJucator2[cj2] = jucator2;
+                }
+            }
+            else if(mutare == 2){
+                if(numarMutare % 2 == 1){
+                    numar = ((numarMutare + ((jucator2 + n) % 10)) % 6) + 1;
+                }
+                else{
+                    numar = ((((numarMutare + 1) % 5) + ((jucator2 + n) % 10)) % 6) + 1;
+                }
+
+                jucator2 += numar;
+                cj2 ++;
+                casuteJucator2[cj2] = jucator2;
+
+                if(numar != 6){
+                    mutare = 1;
+                }
+
+                if(jucator1 == jucator2){
+                    cj1 ++;
+                    jucator1 = 1;
+                    casuteJucator1[cj1] = jucator1;
+                }
+            }
+        }
+
+        if(jucator1 > jucator2){
+            for(int i = 1; i <= cj1; ++ i){
+                fout << min(casuteJucator1[i], n) << ' ';
+            }FINISH;
+        }
+        else{
+            for(int i = 1; i <= cj2; ++ i){
+                fout << min(casuteJucator2[i], n) << ' ';
+            }FINISH;
+        }
+    }
+}
